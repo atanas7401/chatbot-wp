@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<title>Чатбот</title>
+<style>
+.chat-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: Arial, sans-serif;
+}
+.chat-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #3498db;
+    color: #fff;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.chat-tooltip {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    background: #2d2d2d;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 260px;
+    display: block;
+}
+.chat-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 300px;
+    max-height: 400px;
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    display: none;
+    flex-direction: column;
+}
+.chat-header {
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+.chat-header p {
+    margin: 0;
+}
+.chat-messages {
+    padding: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.user-message {
+    align-self: flex-end;
+    background: #3498db;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 10px;
+    margin: 4px 0;
+    max-width: 85%;
+}
+.bot-message {
+    align-self: flex-start;
+    background: #e0e0e0;
+    color: #000;
+    padding: 6px 10px;
+    border-radius: 10px;
+    margin: 4px 0;
+    max-width: 85%;
+}
+.chat-input {
+    display: flex;
+    border-top: 1px solid #ddd;
+}
+#user-input {
+    flex-grow: 1;
+    border: none;
+    padding: 10px;
+}
+#send-btn {
+    border: none;
+    background: #3498db;
+    color: #fff;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div class="chat-container">
+    <div id="chat-tooltip" class="chat-tooltip">AI Асистент на Агенцията за автоматизация с изкуствен интелект</div>
+    <div id="chat-window" class="chat-window">
+        <div class="chat-header">
+            <p>🤖 Здравейте! Имате ли нужда от автоматизация на бизнес процеси с изкуствен интелект?<br>
+            Освен това мога да ви помогна да получите европейско финансиране или да участвате в търгове в Гърция.<br><br>
+            Пишете ми – ще ви насоча веднага! 🧠📈</p>
+        </div>
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Вашето съобщение...">
+            <button id="send-btn">Изпрати</button>
+        </div>
+    </div>
+    <button id="chat-toggle" class="chat-toggle">💬</button>
+</div>
+<script>
+var toggleBtn = document.getElementById('chat-toggle');
+var chatWindow = document.getElementById('chat-window');
+var tooltip = document.getElementById('chat-tooltip');
+var sendBtn = document.getElementById('send-btn');
+var userInput = document.getElementById('user-input');
+var messages = document.getElementById('chat-messages');
+
+function toggleChat() {
+    if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+        chatWindow.style.display = 'flex';
+        tooltip.style.display = 'none';
+    } else {
+        chatWindow.style.display = 'none';
+        tooltip.style.display = 'block';
+    }
+}
+
+function sendMessage() {
+    var text = userInput.value.trim();
+    if (!text) return;
+    var userMsg = document.createElement('div');
+    userMsg.className = 'user-message';
+    userMsg.textContent = text;
+    messages.appendChild(userMsg);
+    userInput.value = '';
+
+    var botMsg = document.createElement('div');
+    botMsg.className = 'bot-message';
+    botMsg.textContent = 'Бот: Благодаря за вашето съобщение!';
+    messages.appendChild(botMsg);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+toggleBtn.addEventListener('click', toggleChat);
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', function(e){
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+</script>
+</body>
+</html>
