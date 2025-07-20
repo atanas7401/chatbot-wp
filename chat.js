@@ -1,4 +1,4 @@
-const apiKey = "YOUR_API_KEY_HERE"; // заменете с предоставения ключ
+const apiKey = process.env.OPENAI_API_KEY; // използва ключа от променливата на средата
 const contact = "\uD83D\uDCDE \u0415\u0412\u0420\u041E \u041F\u0420\u041E\u0415\u041A\u0422 \u041A\u041E\u041C\u0415\u0420\u0421 \u0415\u041E\u041E\u0414\n\u260E\uFE0F 0877 887 673\n\u2709\uFE0F atanas7401@gmail.com";
 const systemPrompt = "Ти си полезен GPT-4o асистент на български.";
 let history = [{role: 'system', content: systemPrompt}];
