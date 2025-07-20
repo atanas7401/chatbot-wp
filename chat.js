@@ -52,3 +52,4 @@ function send() {
 document.getElementById('toggle-btn').addEventListener('click', toggle);
 document.getElementById('send-btn').addEventListener('click', send);
 document.getElementById('user-input').addEventListener('keypress', (e)=>{ if(e.key==='Enter') send(); });
+// PR test
