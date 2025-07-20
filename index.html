@@ -2,171 +2,88 @@
 <html lang="bg">
 <head>
 <meta charset="UTF-8">
-<title>Чатбот</title>
+<title>GPT Чатбот</title>
 <style>
-.chat-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 9999;
-    font-family: Arial, sans-serif;
-}
-.chat-toggle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #3498db;
-    color: #fff;
-    font-size: 30px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
-.chat-tooltip {
-    position: absolute;
-    bottom: 80px;
-    right: 0;
-    background: #2d2d2d;
-    color: #fff;
-    padding: 10px;
-    border-radius: 10px;
-    max-width: 260px;
-    display: block;
-}
-.chat-window {
-    position: absolute;
-    bottom: 80px;
-    right: 0;
-    width: 300px;
-    max-height: 400px;
-    background: #ffffff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    display: none;
-    flex-direction: column;
-}
-.chat-header {
-    background: #f5f5f5;
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
-}
-.chat-header p {
-    margin: 0;
-}
-.chat-messages {
-    padding: 10px;
-    flex-grow: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-}
-.user-message {
-    align-self: flex-end;
-    background: #3498db;
-    color: #fff;
-    padding: 6px 10px;
-    border-radius: 10px;
-    margin: 4px 0;
-    max-width: 85%;
-}
-.bot-message {
-    align-self: flex-start;
-    background: #e0e0e0;
-    color: #000;
-    padding: 6px 10px;
-    border-radius: 10px;
-    margin: 4px 0;
-    max-width: 85%;
-}
-.chat-input {
-    display: flex;
-    border-top: 1px solid #ddd;
-}
-#user-input {
-    flex-grow: 1;
-    border: none;
-    padding: 10px;
-}
-#send-btn {
-    border: none;
-    background: #3498db;
-    color: #fff;
-    padding: 10px 15px;
-    cursor: pointer;
-}
+body { font-family: Arial, sans-serif; }
+.chat-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+#chat-window { display: none; flex-direction: column; width: 320px; height: 420px; border: 1px solid #ccc; border-radius: 8px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.chat-header { background: #f5f5f5; padding: 10px; border-bottom: 1px solid #ddd; }
+#messages { flex-grow: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; }
+.user { align-self: flex-end; background: #3498db; color: #fff; padding: 6px 10px; border-radius: 10px; margin: 4px 0; max-width: 85%; }
+.bot { align-self: flex-start; background: #e0e0e0; color: #000; padding: 6px 10px; border-radius: 10px; margin: 4px 0; max-width: 85%; white-space: pre-wrap; }
+.chat-input { display: flex; border-top: 1px solid #ddd; }
+#user-input { flex-grow: 1; border: none; padding: 10px; }
+#send-btn { border: none; background: #3498db; color: #fff; padding: 10px 15px; cursor: pointer; }
+#toggle-btn { width: 60px; height: 60px; border-radius: 50%; background: #3498db; color: #fff; font-size: 30px; border: none; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
 </style>
 </head>
 <body>
 <div class="chat-container">
-    <div id="chat-tooltip" class="chat-tooltip">AI асистент за европейско финансиране и бизнес автоматизация</div>
-    <div id="chat-window" class="chat-window">
-        <div class="chat-header">
-            <p id="system-message"></p>
-        </div>
-        <div id="chat-messages" class="chat-messages"></div>
+    <button id="toggle-btn">💬</button>
+    <div id="chat-window">
+        <div class="chat-header">GPT асистент</div>
+        <div id="messages"></div>
         <div class="chat-input">
-            <input type="text" id="user-input" placeholder="Вашето съобщение...">
+            <input id="user-input" type="text" placeholder="Вашето съобщение..." />
             <button id="send-btn">Изпрати</button>
         </div>
     </div>
-    <button id="chat-toggle" class="chat-toggle">💬</button>
 </div>
 <script>
-const systemPrompt = `Ти си AI асистент на агенция за европейско финансиране и бизнес автоматизация.
-Отговаряй компетентно, ясно и учтиво на въпроси за:
-- европейски програми и кандидатстване
-- възможности за финансиране
-- услуги по автоматизация с изкуствен интелект
-Не давай лични мнения и не се отклонявай от темата.`;
+const apiKey = "YOUR_API_KEY_HERE"; // заменете с предоставения ключ
+const contact = "\uD83D\uDCDE \u0415\u0412\u0420\u041E \u041F\u0420\u041E\u0415\u041A\u0422 \u041A\u041E\u041C\u0415\u0420\u0421 \u0415\u041E\u041E\u0414\n\u260E\uFE0F 0877 887 673\n\u2709\uFE0F atanas7401@gmail.com";
+const systemPrompt = "Ти си полезен GPT-4o асистент на български.";
+let history = [{role: 'system', content: systemPrompt}];
 
-const contactInfo = `Контакти на агенцията ЕВРО ПРОЕКТ КОМЕРС ЕООД
-Телефон: ☎️ 0877 887 673
-Имейл: ✉️ atanas7401@gmail.com`;
-
-document.getElementById('system-message').innerHTML =
-    systemPrompt.replace(/\n/g, '<br>') + '<br><br>' +
-    contactInfo.replace(/\n/g, '<br>');
-var toggleBtn = document.getElementById('chat-toggle');
-var chatWindow = document.getElementById('chat-window');
-var tooltip = document.getElementById('chat-tooltip');
-var sendBtn = document.getElementById('send-btn');
-var userInput = document.getElementById('user-input');
-var messages = document.getElementById('chat-messages');
-
-function toggleChat() {
-    if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
-        chatWindow.style.display = 'flex';
-        tooltip.style.display = 'none';
-    } else {
-        chatWindow.style.display = 'none';
-        tooltip.style.display = 'block';
-    }
+function toggle() {
+    const win = document.getElementById('chat-window');
+    win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
 }
 
-function sendMessage() {
-    var text = userInput.value.trim();
+function addMessage(text, cls) {
+    const div = document.createElement('div');
+    div.className = cls;
+    div.textContent = text;
+    document.getElementById('messages').appendChild(div);
+    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+}
+
+function send() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
     if (!text) return;
-    var userMsg = document.createElement('div');
-    userMsg.className = 'user-message';
-    userMsg.textContent = text;
-    messages.appendChild(userMsg);
-    userInput.value = '';
+    addMessage(text, 'user');
+    input.value = '';
 
-    var botMsg = document.createElement('div');
-    botMsg.className = 'bot-message';
-    botMsg.textContent = 'Бот: Благодаря за вашето съобщение!';
-    messages.appendChild(botMsg);
-    messages.scrollTop = messages.scrollHeight;
+    // ако потребителят казва "благодаря", "чао" или "довиждане"
+    const farewell = /(\bблагодаря\b|\bчао\b|\bдовиждане\b)/i.test(text);
+    const payload = { model: 'gpt-4o', messages: history.concat({role: 'user', content: text}) };
+
+    fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.ok ? r.json() : Promise.reject(r))
+    .then(data => {
+        let answer = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+        if (!answer || !answer.trim()) {
+            addMessage(contact, 'bot');
+            return;
+        }
+        history.push({role:'user', content:text});
+        history.push({role:'assistant', content:answer});
+        if (farewell) answer += '\n\n' + contact;
+        addMessage(answer, 'bot');
+    })
+    .catch(() => {
+        addMessage(contact, 'bot');
+    });
 }
 
-toggleBtn.addEventListener('click', toggleChat);
-sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keypress', function(e){
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
-});
+document.getElementById('toggle-btn').addEventListener('click', toggle);
+document.getElementById('send-btn').addEventListener('click', send);
+document.getElementById('user-input').addEventListener('keypress', (e)=>{ if(e.key==='Enter') send(); });
 </script>
 </body>
 </html>
