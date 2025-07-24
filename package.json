@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/atanas7401/chatbot-wp#readme",
   "dependencies": {
+    "dotenv": "^17.2.0",
     "express": "^5.1.0"
   }
 }
