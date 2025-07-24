@@ -1,5 +1,11 @@
 require('dotenv').config();
 const express = require('express');
+
+if (!process.env.OPENAI_API_KEY) {
+  console.error('Error: OPENAI_API_KEY is not set.');
+  process.exit(1);
+}
+
 const app = express();
 
 app.use(express.json());
