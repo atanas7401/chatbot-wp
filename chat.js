@@ -1,4 +1,4 @@
-const apiKey = process.env.OPENAI_API_KEY; // използва ключа от променливата на средата
+// API key is kept on the server; client communicates with /api/chat
 const contact = "\uD83D\uDCDE \u0415\u0412\u0420\u041E \u041F\u0420\u041E\u0415\u041A\u0422 \u041A\u041E\u041C\u0415\u0420\u0421 \u0415\u041E\u041E\u0414\n\u260E\uFE0F 0877 887 673\n\u2709\uFE0F atanas7401@gmail.com";
 const systemPrompt = "Ти си полезен GPT-4o асистент на български.";
 let history = [{role: 'system', content: systemPrompt}];
@@ -27,9 +27,9 @@ function send() {
     const farewell = /(\bблагодаря\b|\bчао\b|\bдовиждане\b)/i.test(text);
     const payload = { model: 'gpt-4o', messages: history.concat({role: 'user', content: text}) };
 
-    fetch('https://api.openai.com/v1/chat/completions', {
+    fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
     .then(r => r.ok ? r.json() : Promise.reject(r))
@@ -52,6 +52,3 @@ function send() {
 document.getElementById('toggle-btn').addEventListener('click', toggle);
 document.getElementById('send-btn').addEventListener('click', send);
 document.getElementById('user-input').addEventListener('keypress', (e)=>{ if(e.key==='Enter') send(); });
-// PR test
-// нов ред от тест
-// тестов ред за PR
